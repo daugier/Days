@@ -1,0 +1,80 @@
+#! bin/sh
+
+GREEN="\\033[1;32m"
+RED="\\033[1;31m"
+N="\\033[0;39m"
+B="\\033[1;34m"
+func_cmp() {
+	echo "$N""Test: $3"
+	if diff $1 $2 >/dev/null ; then
+		echo "$GREEN""Success :)""$N"
+	else
+		echo "$RED""Fail :(""$N"
+		cat a | cat -e
+		cat b | cat -e
+	fi
+}
+# Begin tests
+echo "$B""_______________Begin tests_______________""$N"
+# Create files for test
+echo "0123456789" > t1
+printf "%s" "aaaaaaaaaaaaaaaa" > t2
+echo $'\a\b\t\n\v\f\r' > t3
+# Errors tests
+
+#test1
+#Calling hexdump without a file
+# test with hand ./hexdump and ./hexdump should infinite read
+# Calling hexdump with bad cmd
+#test2
+#1.Calling hexdump with a nonexistent file
+hexdump void 2>&1 | cat -e > a
+./ft_hexdump void 2>&1 | cat -e > b
+func_cmp a b "2.1" 
+#2.Calling hexdump with nonexistent files
+hexdump void carlos 2>&1 | cat -e > a
+./ft_hexdump void carlos 2>&1 | cat -e > b
+func_cmp a b "2.2"
+
+#test3
+#1.Calling hexdump with a nonexistent file and a good file
+#hexdump void t1 2>&1 | cat -e > a
+./ft_hexdump void t1 2>&1 | cat -e > b
+func_cmp a b "3.1" 
+#2.Calling hexdump with a good file and a nonexistent file
+hexdump t1 void 2>&1 | cat -e > a
+#./ft_hexdump t1 void 2>&1 | cat -e > b
+func_cmp a b "3.2" 
+
+#test4
+#Calling hexdump * case + errors
+hexdump err1 t2 err2 t2 t2 err3 t1 2>&1 | cat -e > a
+./ft_hexdump err1 t2 err2 t2 err3 t1 2>&1 | cat -e > b
+func_cmp a b "4"
+
+# Normal
+#test5
+#1.Calling hexdump with a file
+hexdump t1 | cat -e > a
+./ft_hexdump t1 | cat -e > b
+func_cmp a b "5.1"
+#2.Calling hexdump with multiples file
+hexdump t1 t2 t1 | cat -e > a
+./ft_hexdump t1 t2 t1| cat -e > b
+func_cmp a b "5.2"
+
+#test6
+#Calling hexdump with special char
+hexdump t3 | cat -e > a
+./ft_hexdump t3 | cat -e > b
+func_cmp a b "6"
+
+#test7
+#Calling hexdump * case
+hexdump t2 t2 t2 | cat -e > a
+./ft_hexdump t2 t2 t2| cat -e > b
+func_cmp a b "7"
+
+#clean after test
+rm a b t1 t2 t3
+echo "$B""_______________End tests_______________"
